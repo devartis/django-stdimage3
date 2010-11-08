@@ -1,3 +1,4 @@
+from django.core.files.images import get_image_dimensions
 from django.db.models.fields.files import ImageField
 from django.db.models import signals
 from django.conf import settings
@@ -23,6 +24,20 @@ class ThumbnailField:
 
     def size(self):
         return self.storage.size(self.name)
+
+    def is_landscape(self):
+        return self.orientation() == 'landscape'
+
+    def is_portrait(self):
+        return self.orientation() == 'portrait'
+
+    def orientation(self):
+        w, h = get_image_dimensions(self.path())
+        if w > h:
+            return 'landscape'
+        else:
+            return 'portrait'
+
 
 class StdImageField(ImageField):
     '''
@@ -76,7 +91,10 @@ class StdImageField(ImageField):
             else:
                 img.thumbnail((size['width'], size['height']), Image.ANTIALIAS)
             try:
-                img.save(filename, optimize=1)
+                if img.format in ("gif", "GIF"):
+                    img.save(filename, quality=100)
+                else:
+                    img.save(filename, optimize=1, quality=100)
             except IOError:
                 img.save(filename)
 
@@ -127,12 +145,17 @@ class StdImageField(ImageField):
             is selected
         '''
         if data == '__deleted__':
-            filename = getattr(instance, self.name).path
-            if os.path.exists(filename):
-                os.remove(filename)
-            thumbnail_filename = self._get_thumbnail_filename(filename)
-            if os.path.exists(thumbnail_filename):
-                os.remove(thumbnail_filename)
+            if getattr(instance, self.name):
+                filename  = getattr(instance, self.name).path
+                thumbnail = self._get_thumbnail_filename(filename)
+                try:
+                    os.remove(filename)
+                except:
+                    pass
+                try:
+                    os.remove(thumbnail)
+                except:
+                    pass
             setattr(instance, self.name, None)
         else:
             super(StdImageField, self).save_form_data(instance, data)
@@ -154,4 +177,3 @@ class StdImageField(ImageField):
         super(StdImageField, self).contribute_to_class(cls, name)
         signals.post_save.connect(self._rename_resize_image, sender=cls)
         signals.post_init.connect(self._set_thumbnail, sender=cls)
-
