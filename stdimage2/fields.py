@@ -102,21 +102,22 @@ class StdImageField(ImageField):
         '''
         Renames the image, and calls methods to resize and create the thumbnail
         '''
-        if getattr(instance, self.name):
-            filename = getattr(instance, self.name).path
-            ext = os.path.splitext(filename)[1].lower().replace('jpg', 'jpeg')
-            dst = self.generate_filename(instance, '%s_%s%s' % (self.name, instance._get_pk_val(), ext))
-            dst_fullpath = os.path.join(settings.MEDIA_ROOT, dst)
-            if os.path.normcase(os.path.abspath(filename)) != os.path.normcase(os.path.abspath(dst_fullpath)):
-                os.rename(filename, dst_fullpath)
-                if self.size:
-                    self._resize_image(dst_fullpath, self.size)
-                if self.thumbnail_size:
-                    thumbnail_filename = self._get_thumbnail_filename(dst_fullpath)
-                    shutil.copyfile(dst_fullpath, thumbnail_filename)
-                    self._resize_image(thumbnail_filename, self.thumbnail_size)
-                setattr(instance, self.attname, dst)
-                instance.save()
+        if not kwargs.get('raw', None):
+            if getattr(instance, self.name):
+                filename = getattr(instance, self.name).path
+                ext = os.path.splitext(filename)[1].lower().replace('jpg', 'jpeg')
+                dst = self.generate_filename(instance, '%s_%s%s' % (self.name, instance._get_pk_val(), ext))
+                dst_fullpath = os.path.join(settings.MEDIA_ROOT, dst)
+                if os.path.normcase(os.path.abspath(filename)) != os.path.normcase(os.path.abspath(dst_fullpath)):
+                    os.rename(filename, dst_fullpath)
+                    if self.size:
+                        self._resize_image(dst_fullpath, self.size)
+                    if self.thumbnail_size:
+                        thumbnail_filename = self._get_thumbnail_filename(dst_fullpath)
+                        shutil.copyfile(dst_fullpath, thumbnail_filename)
+                        self._resize_image(thumbnail_filename, self.thumbnail_size)
+                    setattr(instance, self.attname, dst)
+                    instance.save()
 
     def _set_thumbnail(self, instance=None, **kwargs):
         '''
