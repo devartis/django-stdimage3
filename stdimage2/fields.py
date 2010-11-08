@@ -136,6 +136,7 @@ class StdImageField(ImageField):
         Specify form field and widget to be used on the forms
         '''
         kwargs['widget'] = DelAdminFileWidget
+        kwargs['widget'] = DelAdminFileWidget(show_delete_checkbox=self.blank)
         kwargs['form_class'] = StdImageFormField
         return super(StdImageField, self).formfield(**kwargs)
 

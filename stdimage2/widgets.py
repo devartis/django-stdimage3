@@ -9,6 +9,10 @@ class DelAdminFileWidget(AdminFileWidget):
     A AdminFileWidget that shows a delete checkbox
     '''
     input_type = 'file'
+    
+    def __init__(self, show_delete_checkbox=True, attrs={}):
+        super(DelAdminFileWidget, self).__init__(attrs)
+        self.show_delete_checkbox = show_delete_checkbox
 
     def render(self, name, value, attrs=None):
         input = super(forms.widgets.FileInput, self).render(name, value, attrs)
@@ -18,7 +22,8 @@ class DelAdminFileWidget(AdminFileWidget):
             output.append('<table style="border-style: none;">')
             output.append(item % (_('Currently:'), '<a target="_blank" href="%s%s">%s</a>' % (settings.MEDIA_URL, value, value)))
             output.append(item % (_('Change:'), input))
-            output.append(item % (_('Delete') + ':', '<input type="checkbox" name="%s_delete"/>' % name)) # split colon to force "Delete" that is already translated
+            if self.show_delete_checkbox:
+                output.append(item % (_('Delete') + ':', '<input type="checkbox" name="%s_delete"/>' % name)) # split colon to force "Delete" that is already translated            
             output.append('</table>')
             return mark_safe(u''.join(output))
         else:
