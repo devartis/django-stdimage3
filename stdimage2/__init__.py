@@ -12,6 +12,6 @@ try:
         },
       )
     ]
-    add_introspection_rules(rules, ["^stdimage\.fields"])
+    add_introspection_rules(rules, ["^stdimage2\.fields"])
 except ImportError:
     pass
