@@ -169,13 +169,13 @@ class StdImageField(ImageField):
         else:
             super(StdImageField, self).save_form_data(instance, data)
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, *args, **kwargs):
         '''
             Overwrite get_db_prep_save to allow saving nothing to the database
             if image has been deleted
         '''
         if value:    
-            return super(StdImageField, self).get_db_prep_save(value)
+            return super(StdImageField, self).get_db_prep_save(value, *args, **kwargs)
         else:
             return u''
 
