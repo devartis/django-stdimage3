@@ -1,4 +1,4 @@
-from stdimage2.fields import StdImageField
+from stdimage3.fields import StdImageField
 
 try:
     from south.modelsinspector import add_introspection_rules
@@ -12,6 +12,6 @@ try:
         },
       )
     ]
-    add_introspection_rules(rules, ["^stdimage2\.fields"])
+    add_introspection_rules(rules, ["^stdimage3\.fields"])
 except ImportError:
     pass
