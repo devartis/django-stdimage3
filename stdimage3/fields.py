@@ -115,12 +115,13 @@ class StdImageField(ImageField):
                         dst = '%s%d%s' % (prefix, time.time(), ext)
                         dst_fullpath = os.path.join(settings.MEDIA_ROOT, dst)
                         os.rename(filename, dst_fullpath)
-                        if self.size:
-                            self._resize_image(dst_fullpath, self.size)
                         if self.thumbnail_size:
                             thumbnail_filename = self._get_thumbnail_filename(dst_fullpath)
                             shutil.copyfile(dst_fullpath, thumbnail_filename)
                             self._resize_image(thumbnail_filename, self.thumbnail_size)
+                        
+                        if self.size:
+                            self._resize_image(dst_fullpath, self.size)
                         setattr(instance, self.attname, dst)
                         instance.save()
                 except:
