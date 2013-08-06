@@ -133,7 +133,7 @@ class StdImageField(ImageField):
         Thumbnail attribute will be of the same class of original image, so
         "path", "url"... properties can be used
         '''
-        if getattr(instance, self.name):
+        if getattr(instance, self.name) and self.thumbnail_size != None:
             filename = self.generate_filename(instance, os.path.basename(getattr(instance, self.name).path))
             thumbnail_filename = self._get_thumbnail_filename(filename)
             thumbnail_field = ThumbnailField(thumbnail_filename)
